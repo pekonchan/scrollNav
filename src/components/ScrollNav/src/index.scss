@@ -1,0 +1,24 @@
+.scroll-nav {
+    .nav-bar {
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        li {
+            display: inline-block;
+            padding: 0 16px;
+            cursor: pointer;
+            &.is-active {
+                color: #387af6;
+                border-bottom: 2px solid #387af6;
+            }
+        }
+
+        &.is-fixed {
+            position: fixed;
+            width: calc(100vw - 432px);
+            z-index: 99999;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
+}
