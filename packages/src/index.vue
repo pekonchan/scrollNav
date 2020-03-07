@@ -96,7 +96,7 @@ export default {
         },
         left: { // 固定之后的left值
             type: [Number, String],
-            default: 0
+            default: 'auto'
         },
         bottom: { // 固定之后的bottom值
             type: [Number, String],
@@ -227,7 +227,6 @@ export default {
         }
     },
     mounted () {
-        console.log(this.$slots.default);
         this.hanldeResize();
         this.scrollContainer = document.querySelector(this.relativeName);
         this.scrollTarget.addEventListener('scroll', this.handleScroll);
