@@ -13,7 +13,7 @@
                     height: navBarFixed ? navFixedHeight : '100%'
                 }">
                 <li
-                    v-for="(item, index) in menu"
+                    v-for="(item, index) in navMenu"
                     :key="item.value"
                     :class="{'is-active': item.checked}"
                     @click="selectNav(item, index)">
@@ -112,9 +112,10 @@ export default {
         };
     },
     computed: {
+        // 如果用户导航栏选项未传checked，那么默认把checked置为false
         navMenu () {
             return this.menu.map(item => {
-                item.checked = item.checked || false;
+                this.$set(item, 'checked', item.checked || false);
                 return item;
             });
         },
@@ -171,7 +172,7 @@ export default {
             this.scrollContainer.scrollTop = this.offsetTops[`content${index}`] - this.scrollDeviation;
         },
         resetNavSelect () {
-            this.menu.forEach(item => {
+            this.navMenu.forEach(item => {
                 item.checked = false;
             });
         },
@@ -182,7 +183,7 @@ export default {
             const top = this.scrollContainer.scrollTop;
             // 这是用来判断目前滚动在于哪个导航上的值，对滚动容器scrollTop做了偏差值处理
             const fixedBaseTop = top + this.scrollDeviation;
-            const menuLength = this.menu.length;
+            const menuLength = this.navMenu.length;
             if (this.needFixed) {
                 // 这是控制导航栏吸顶 - 吸顶
                 if ((top + this.extraFixed) >= this.offsetTops.navBar) {
@@ -196,21 +197,21 @@ export default {
             this.resetNavSelect();
             // 滚动条到达底部就选中最后一个导航
             if (top + this.scrollContainer.clientHeight >= this.scrollContainer.scrollHeight) {
-                this.menu[menuLength - 1].checked = true;
+                this.navMenu[menuLength - 1].checked = true;
                 return;
             }
             // 以下都为依据滚动自动选择对应导航
             for (let i = 0; i < menuLength - 1; i++) {
                 if (fixedBaseTop >= this.offsetTops[`content${i}`] && fixedBaseTop < this.offsetTops[`content${i + 1}`]) {
-                    this.menu[i].checked = true;
+                    this.navMenu[i].checked = true;
                     return;
                 }
             }
             if (fixedBaseTop >= this.offsetTops[`content${menuLength - 1}`]) {
-                this.menu[menuLength - 1].checked = true;
+                this.navMenu[menuLength - 1].checked = true;
                 return;
             }
-            this.menu[0].checked = true;
+            this.navMenu[0].checked = true;
         },
         /**
          * 计算页面的各个offsetTop，主要供父组件使用，用于当父组件内容发生高度变化时，重新计算offsetTop值
@@ -218,7 +219,7 @@ export default {
         calcTop (recalNav) {
             this.$nextTick(() => {
                 recalNav && (this.offsetTops.navBar = document.querySelector('.scroll-nav .nav-bar-wrap').offsetTop);
-                this.menu.forEach((item, index) => {
+                this.navMenu.forEach((item, index) => {
                     this.offsetTops[`content${index}`] = this.$slots.default[index].elm.offsetTop;
                 });
             });
