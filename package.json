@@ -1,12 +1,15 @@
 {
-  "name": "scroll-nav",
+  "name": "vue-scroll-nav",
   "version": "0.1.0",
-  "private": true,
+  "keyword": "vue-scroll-nav scrollnav scrollNav ScrollNav VueScrollNav scroll nav fixed sticky menu",
+  "author": "pekonchan",
+  "main": "lib/vue-scroll-nav.umd.min.js",
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name ScrollNav /src/components/ScrollNav"
+    "lib": "vue-cli-service build --target lib --name vue-scroll-nav --dest lib packages/index.js"
   },
   "dependencies": {
     "core-js": "^3.6.4",

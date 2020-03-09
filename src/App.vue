@@ -7,15 +7,15 @@
       :height="52"
       :extraFixed="-24"
       relativeName="html">
-      <div class="content1">导航1内容</div>
-      <div class="content2">导航2内容</div>
-      <div class="content3">导航3内容</div>
+      <div class="content">导航1内容</div>
+      <div class="content">导航2内容</div>
+      <div class="content">导航3内容</div>
     </Scroll-Nav>
   </div>
 </template>
 
 <script>
-import ScrollNav from './components/ScrollNav/src';
+import ScrollNav from '../packages';
 
 export default {
   name: 'App',
@@ -27,17 +27,14 @@ export default {
       navs: [
         {
           label: '导航1',
-          value: '.content1',
           checked: true
         },
         {
           label: '导航2',
-          value: '.content2',
           checked: false
         },
         {
           label: '导航3',
-          value: '.content3',
           checked: false
         }
       ]
@@ -58,18 +55,9 @@ export default {
       height: 200px;
       background: #dbdbdb;
   }
-  %content {
+  .content {
     margin-top: 16px;
     background: #dbdbdb;
     height: 600px;
-  }
-  .content1 {
-    @extend %content;
-  }
-  .content2 {
-    @extend %content;
-  }
-  .content3 {
-    @extend %content;
   }
 </style>

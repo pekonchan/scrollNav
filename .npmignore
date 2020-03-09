@@ -1,0 +1,9 @@
+# 忽略目录
+packages/
+public/
+readmeAssets/
+src/
+
+# 忽略指定文件
+babel.config.js
+*.map

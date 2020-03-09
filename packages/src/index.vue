@@ -13,10 +13,10 @@
                     height: navBarFixed ? navFixedHeight : '100%'
                 }">
                 <li
-                    v-for="item in menu"
+                    v-for="(item, index) in menu"
                     :key="item.value"
                     :class="{'is-active': item.checked}"
-                    @click="selectNav(item)">
+                    @click="selectNav(item, index)">
                     {{item.label}}
                 </li>
             </ul>
@@ -29,25 +29,27 @@
 export default {
     name: 'ScrollNav',
     props: {
+        // 导航栏选项
         menu: {
             required: true,
             type: Array,
             default () {
-                // 传值格式：{label: '', value: null, checked: false}
-                // value为对应内容的元素标识（可类名id名等元素标识）
+                // 传值格式：{label: '', checked: false}
                 return [];
             }
         },
-        // 只能是px作为最终单位，因为要垂直居中，用到line-height，用于计算scrollDeviation
+        // 未固定前的导航栏高度
         height: {
             type: Number,
             default: 52
         },
+        // 未固定前的导航栏宽度
         width: {
             type: [Number, String],
             default: 'auto'
         },
-        relativeName: { // 滚动条所在区域的名字（可类名id名等元素标识）
+        // 滚动条所在区域的名字（可类名id名等元素标识）
+        relativeName: {
             type: String,
             default: 'html'
         },
@@ -84,7 +86,7 @@ export default {
         },
         left: { // 固定之后的left值
             type: [Number, String],
-            default: 0
+            default: 'auto'
         },
         bottom: { // 固定之后的bottom值
             type: [Number, String],
@@ -106,10 +108,16 @@ export default {
             },
             navBarFixed: false, // 导航栏是否被固定了
             scrollContainer: null, // 滚动条所在容器
-            fixedHeightPx: 0
+            fixedHeightPx: 0 // 导航栏固定后的实际高度px值
         };
     },
     computed: {
+        navMenu () {
+            return this.menu.map(item => {
+                item.checked = item.checked || false;
+                return item;
+            });
+        },
         // 主要是未固定前的导航栏的高度
         navHeight () {
             return this.createValue(this.height);
@@ -145,7 +153,7 @@ export default {
             const extra = this.extraScroll ? this.extraScroll : this.extraFixed
             return this.needFixed ? this.fixedHeightPx + extra : extra;
         },
-        // 监听滚动事件的元素对象
+        // 绑定滚动事件的元素对象
         scrollTarget () {
             return this.relativeName.toLowerCase() === 'html' ? window : this.scrollContainer;
         }
@@ -157,13 +165,10 @@ export default {
         /**
          * 选择标题跳到对应内容
          */
-        selectNav (nav) {
+        selectNav (nav, index) {
             this.resetNavSelect();
             nav.checked = true;
-            this.scrollContainer.scrollTop = document.querySelector(nav.value).offsetTop - this.scrollDeviation;
-            // this.$nextTick(() => {
-            //     this.navBarFixed && this.selectNav(nav);
-            // });
+            this.scrollContainer.scrollTop = this.offsetTops[`content${index}`] - this.scrollDeviation;
         },
         resetNavSelect () {
             this.menu.forEach(item => {

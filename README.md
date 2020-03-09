@@ -1,24 +1,13 @@
-# scroll-nav
+# vue-scroll-nav
 
-## Project setup
-```
-npm install
-```
+## 描述
+此为vue版滚动导航组件，实现
+- 滚动时，根据滚动距离判断当前内容所属哪个导航
+- 点击导航，页面滚动到内容对应位置
+- 可控制导航栏是否吸附固定，如吸顶效果，即滚动一定距离后，导航栏固定起来，不会被滚动出可视区域
+- 可用在页面任何位置上，不一定是顶部导航这种简单应用哦，可以复杂型应用
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+此处举一个稍微复杂点的情况：
+![image](https://note.youdao.com/yws/public/resource/0360b2ee451da7a13dab208e3fe21df1/xmlnote/7A5F1D25179C427D939D22E89A9AE8E3/14459)
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+具体深度解释该组件的一个开发思路，可看此文章[滚动导航+吸顶合并方案（含stikcy详解）]()
