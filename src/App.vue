@@ -4,13 +4,12 @@
     <Scroll-Nav
       ref="scrollNav"
       :menu="navs"
+      :height="52"
       :extraFixed="-24"
-      :extraScroll="-24"
-      relativeName="html"
-      :contentName="['.content1', '.content2', '.content3']">
-      <div class="content1">导航1内容</div>
-      <div class="content2">导航2内容</div>
-      <div class="content3">导航3内容</div>
+      relativeName="html">
+      <div class="content">导航1内容</div>
+      <div class="content">导航2内容</div>
+      <div class="content">导航3内容</div>
     </Scroll-Nav>
   </div>
 </template>
@@ -28,18 +27,13 @@ export default {
       navs: [
         {
           label: '导航1',
-          value: '.content1',
           checked: true
         },
         {
-          label: '导航2',
-          value: '.content2',
-          checked: false
+          label: '导航2'
         },
         {
-          label: '导航3',
-          value: '.content3',
-          checked: false
+          label: '导航3'
         }
       ]
     };
@@ -51,26 +45,24 @@ export default {
   body {
     margin: 0;
     padding-top: 24px; // 故意设置，让组件传输偏差值进行计算
+    background-color: #f5f6fa;
   }
   #app {
     position: relative; // 故意把导航和导航内容的`offsetParent`变成`#app`
   }
+  %block {
+    border-radius: 5px;
+    box-shadow: 0 1px 8px 4px rgba(0, 0, 0, 0.02);
+    background: #ffffff;
+  }
   .top-section {
-      height: 200px;
-      background: #dbdbdb;
+    margin-bottom: 16px;
+    height: 200px;
+    @extend %block;
   }
-  %content {
+  .content {
     margin-top: 16px;
-    background: #dbdbdb;
     height: 600px;
-  }
-  .content1 {
-    @extend %content;
-  }
-  .content2 {
-    @extend %content;
-  }
-  .content3 {
-    @extend %content;
+    @extend %block;
   }
 </style>
