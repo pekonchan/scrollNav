@@ -2,7 +2,16 @@
     .nav-bar {
         margin: 0;
         padding: 0;
+        line-height: 3.1;
         background-color: #fff;
+        vertical-align:middle;
+        &:after {
+            display: inline-block;
+            content: '';
+            height: 100%;
+            width: 0;
+            vertical-align: middle;
+        }
         li {
             display: inline-block;
             padding: 0 16px;

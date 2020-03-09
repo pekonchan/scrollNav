@@ -4,10 +4,9 @@
     <Scroll-Nav
       ref="scrollNav"
       :menu="navs"
+      :height="52"
       :extraFixed="-24"
-      :extraScroll="-24"
-      relativeName="html"
-      :contentName="['.content1', '.content2', '.content3']">
+      relativeName="html">
       <div class="content1">导航1内容</div>
       <div class="content2">导航2内容</div>
       <div class="content3">导航3内容</div>

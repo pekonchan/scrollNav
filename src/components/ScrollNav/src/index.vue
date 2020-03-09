@@ -2,16 +2,15 @@
     <div class="scroll-nav">
         <div class="nav-bar-wrap" :style="{height: navHeight, width: navWidth}">
            <ul
-                class="nav-bar submodule"
+                class="nav-bar"
                 :class="{'is-fixed': navBarFixed}"
                 :style="{
                     top: navTop,
                     right: navRight,
                     left: navLeft,
                     bottom: navBottom,
-                    width: navBarFixed ? navFixedWidth : 'auto',
-                    height: navBarFixed ? navFixedHeight : '100%',
-                    'line-height': `${height - 2}px`
+                    width: navBarFixed ? navFixedWidth : navWidth,
+                    height: navBarFixed ? navFixedHeight : '100%'
                 }">
                 <li
                     v-for="item in menu"
@@ -49,9 +48,8 @@ export default {
             default: 'auto'
         },
         relativeName: { // 滚动条所在区域的名字（可类名id名等元素标识）
-            required: true,
             type: String,
-            default: ''
+            default: 'html'
         },
         // 对滚动条滚动的高度做运算的值，由于滚动区域的offsetParent可能跟导航栏的offsetParent不一样，会存在差值
         // 所以判断导航栏是否达到固定条件是，需要对滚动区域的scrollTop结合该值做运算
@@ -64,23 +62,13 @@ export default {
         // 但是吸顶之后，只要滚动到吸顶导航栏底部就算到了指定导航内容了，所以相当于只要滚动【内容的offsetTop - 吸顶导航栏的高度】的距离就会到达临界值
         // 转换成公式来理解，c代表导航内容的offsetTop，s代表滚动的距离，吸顶导航栏高度为h。只要滚动距离大于等于上面说的临界值，即肯定到达了对应导航。
         // 因此公式为： s >= c - h， 即 s + h >= c 时，到达条件成立，因此滚动容器的scrollTop都要加上h，才是拿来判断的值
-        // 当然上面说的只是一般的情况，还有滚动容器不是导航对应内容的offsetParent的情况，则需要加减其他偏差值，如padding等，
-        // 所以这里的extraScroll就是表示这些偏差值，一般情况是跟上面的extraFixed等值的，这里我没有沿用extraFixed是因为，
+        // 当然上面说的只是一般的情况，还有滚动容器不是导航对应内容的offsetParent的情况，则需要加减【其他偏差值】，如padding等，
+        // 所以这里的extraScroll就是表示这些【其他偏差值】，一般情况是跟上面的extraFixed等值的，这里我没有沿用extraFixed是因为，
         // 提供更多可能性给用户，有些用户可能不恰好就是用临界情况来区分内容落到哪个导航上，所以提供该值，让可以根据实际情况进行传值。
+        // 但是不设置该值时，会默认沿用extraFixed的值
         extraScroll: {
             type: Number,
             default: 0
-        },
-        // 点击导航栏的导航，跳转到对应内容，设置滚动容器的scrollTop时，一般是等于内容的offsetTop，
-        // 但是你可基于offsetTop做额外的偏差值加减运算，达到你想要的效果。这个额外的偏差值，就是该值
-        extraNav: {
-            type: Number,
-            default: 0
-        },
-        contentName: { // 内容部分的名字（可类名id名等元素标识）
-            required: true,
-            type: Array,
-            default: () => []
         },
         needFixed: { // 是否需要固定导航栏（吸顶）
             type: Boolean,
@@ -108,24 +96,37 @@ export default {
         },
         fixedHeight: { // 导航栏固定后的高度
             type: [Number, String],
-            default: 52
+            default: 0
         }
     },
     data () {
         return {
-            offsetTops: {
+            offsetTops: { // 记录导航栏和导航内容的offsetTop
                 navBar: 0
             },
-            navBarFixed: false,
-            scrollContainer: null
+            navBarFixed: false, // 导航栏是否被固定了
+            scrollContainer: null, // 滚动条所在容器
+            fixedHeightPx: 0
         };
     },
     computed: {
+        // 主要是未固定前的导航栏的高度
         navHeight () {
             return this.createValue(this.height);
         },
+        // 主要是未固定前的导航栏的宽度
         navWidth () {
             return this.createValue(this.width);
+        },
+        // 导航栏固定之后的高度，如果没有设置指定高度，那么默认是用未固定前的导航栏height
+        navFixedHeight () {
+            const height = this.fixedHeight ? this.fixedHeight : this.height;
+            return this.createValue(height);
+        },
+        // 导航栏固定之后的宽度，如果没有设置指定宽度，那么默认是用未固定前的导航栏width
+        navFixedWidth () {
+            const width = this.fixedWidth ? this.fixedWidth : this.width;
+            return this.createValue(width);
         },
         navTop () {
             return this.createValue(this.top);
@@ -139,23 +140,15 @@ export default {
         navRight () {
             return this.createValue(this.right);
         },
-        navFixedWidth () {
-            return this.createValue(this.fixedWidth);
-        },
-        navFixedHeight () {
-            return this.createValue(this.fixedHeight);
-        },
-        // 根据是否需要导航栏固定的条件下，区分生成滚动导航的偏差值
+        // 根据是否需要导航栏固定的条件下，区分生成滚动导航的偏差值，如果没设置extraScroll，默认用extraFixed
         scrollDeviation () {
-            return this.needFixed ? this.height + this.extraScroll : this.extraScroll;
+            const extra = this.extraScroll ? this.extraScroll : this.extraFixed
+            return this.needFixed ? this.fixedHeightPx + extra : extra;
         },
         // 监听滚动事件的元素对象
         scrollTarget () {
             return this.relativeName.toLowerCase() === 'html' ? window : this.scrollContainer;
-        },
-        // tst () {
-        //     return this.$slot.default
-        // }
+        }
     },
     methods: {
         createValue (value) {
@@ -168,6 +161,9 @@ export default {
             this.resetNavSelect();
             nav.checked = true;
             this.scrollContainer.scrollTop = document.querySelector(nav.value).offsetTop - this.scrollDeviation;
+            // this.$nextTick(() => {
+            //     this.navBarFixed && this.selectNav(nav);
+            // });
         },
         resetNavSelect () {
             this.menu.forEach(item => {
@@ -217,17 +213,29 @@ export default {
         calcTop (recalNav) {
             this.$nextTick(() => {
                 recalNav && (this.offsetTops.navBar = document.querySelector('.scroll-nav .nav-bar-wrap').offsetTop);
-                this.contentName.forEach((item, index) => {
-                    this.offsetTops[`content${index}`] = document.querySelector(item).offsetTop;
+                this.menu.forEach((item, index) => {
+                    this.offsetTops[`content${index}`] = this.$slots.default[index].elm.offsetTop;
                 });
             });
         },
         hanldeResize () {
             this.calcTop(true);
+        },
+        /**
+         * 计算实际的导航栏固定后的高度，值是px时的值。
+         * 主要是针对用户传进来的高度是字符串的形式，如百分比等情况。因为组件要用实际的高度px值来做一些运算
+         */
+        calcFixedHeightPx () {
+            const div = document.createElement('div');
+            div.style.position = 'fixed';
+            div.style.height = this.navFixedHeight;
+            document.body.appendChild(div);
+            this.fixedHeightPx = div.offsetHeight;
+            document.body.removeChild(div);
         }
     },
     mounted () {
-        console.log(this.$slots.default);
+        this.calcFixedHeightPx();
         this.hanldeResize();
         this.scrollContainer = document.querySelector(this.relativeName);
         this.scrollTarget.addEventListener('scroll', this.handleScroll);
