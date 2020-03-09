@@ -84,3 +84,5 @@ this.$refs.scrollNav.calcTop(true);
 该组件或许还存在不足之处，或者你的使用场景更广阔，如果你有兴趣的话，可以一起努力完善这个组件。期待你的加入
 
 [github](https://github.com/pekonchan/scrollNav)
+
+有问题，也欢迎提出。
