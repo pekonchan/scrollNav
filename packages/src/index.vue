@@ -15,7 +15,7 @@
                 <li
                     v-for="(item, index) in navMenu"
                     :key="item.value"
-                    :class="{'is-active': item.checked}"
+                    :style="{color: getNavColor(item), borderBottomColor: getNavColor(item, 'border')}"
                     @click="selectNav(item, index)">
                     {{item.label}}
                 </li>
@@ -40,13 +40,13 @@ export default {
         },
         // 未固定前的导航栏高度
         height: {
-            type: Number,
+            type: [Number, String],
             default: 52
         },
         // 未固定前的导航栏宽度
         width: {
             type: [Number, String],
-            default: 'auto'
+            default: '100%'
         },
         // 滚动条所在区域的名字（可类名id名等元素标识）
         relativeName: {
@@ -94,11 +94,15 @@ export default {
         },
         fixedWidth: { // 导航栏固定后的宽度
             type: [Number, String],
-            default: '100%'
+            default: 0
         },
         fixedHeight: { // 导航栏固定后的高度
             type: [Number, String],
             default: 0
+        },
+        color: { // 导航被激活的颜色
+            type: String,
+            default: '#387af6'
         }
     },
     data () {
@@ -162,6 +166,9 @@ export default {
     methods: {
         createValue (value) {
             return typeof value === 'number' ? `${value}px` : value;
+        },
+        getNavColor (nav, type) {
+            return nav.checked ? this.color : type === 'border' ? 'transparent' : 'inherit';
         },
         /**
          * 选择标题跳到对应内容
