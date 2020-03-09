@@ -103,6 +103,26 @@ export default {
         color: { // 导航被激活的颜色
             type: String,
             default: '#387af6'
+        },
+        stickyTop: { // 利用sticky实现后的top值
+            type: [Number, String],
+            default: 0
+        },
+        stickyLeft: { // 利用sticky实现后的left值
+            type: [Number, String],
+            default: 0
+        },
+        stickyRight: { // 利用sticky实现后的right值
+            type: [Number, String],
+            default: 0
+        },
+        stickyBottom: { // 利用sticky实现后的bottom值
+            type: [Number, String],
+            default: 0
+        },
+        useSticky: { // 在浏览器支持的情况下，是否采用sticky形式
+            type: Boolean,
+            default: true
         }
     },
     data () {
@@ -112,7 +132,8 @@ export default {
             },
             navBarFixed: false, // 导航栏是否被固定了
             scrollContainer: null, // 滚动条所在容器
-            fixedHeightPx: 0 // 导航栏固定后的实际高度px值
+            fixedHeightPx: 0, // 导航栏固定后的实际高度px值
+            canUseSticky: false
         };
     },
     computed: {
@@ -153,6 +174,23 @@ export default {
         navRight () {
             return this.createValue(this.right);
         },
+        // 采用sticky方式固定的，如果没设置stickyTop，默认采用top
+        navStickyTop () {
+            const value = this.stickyTop ? this.stickyTop : this.top;
+            return this.createValue(value);
+        },
+        navStickyLeft () {
+            const value = this.stickyLeft ? this.stickyLeft : this.left;
+            return this.createValue(value);
+        },
+        navStickyRight () {
+            const value = this.stickyRight ? this.stickyRight : this.right;
+            return this.createValue(value);
+        },
+        navStickyBottom () {
+            const value = this.stickyBottom ? this.stickyBottom : this.bottom;
+            return this.createValue(value);
+        },
         // 根据是否需要导航栏固定的条件下，区分生成滚动导航的偏差值，如果没设置extraScroll，默认用extraFixed
         scrollDeviation () {
             const extra = this.extraScroll ? this.extraScroll : this.extraFixed
@@ -191,7 +229,7 @@ export default {
             // 这是用来判断目前滚动在于哪个导航上的值，对滚动容器scrollTop做了偏差值处理
             const fixedBaseTop = top + this.scrollDeviation;
             const menuLength = this.navMenu.length;
-            if (this.needFixed) {
+            if (this.needFixed && !this.canUseSticky) {
                 // 这是控制导航栏吸顶 - 吸顶
                 if ((top + this.extraFixed) >= this.offsetTops.navBar) {
                     this.navBarFixed = true;
@@ -245,10 +283,43 @@ export default {
             document.body.appendChild(div);
             this.fixedHeightPx = div.offsetHeight;
             document.body.removeChild(div);
+        },
+        /**
+        * 检查浏览器是否支持sticky
+        */
+        isSupportSticky () {
+            var prefix = ['-o-', '-ms-', '-moz-', '-webkit-', ''];
+            var prefixValue = [];
+            for (var i = 0; i < prefix.length; i++) {
+                prefixValue.push(prefix[i] + 'sticky')
+            }
+            var element = document.createElement('div');
+            var eleStyle = element.style;
+            for (var j = 0; j < prefixValue.length; j++) {
+                eleStyle.position = prefixValue[j];
+            }
+            return eleStyle.position;
+        },
+        /**
+         * 检查浏览器是否有支持的sticky值，没有返回false，有就添加sticky相关css，实现固定
+         */
+        validateSticky () {
+            const supportStickyValue = this.isSupportSticky();
+            if (supportStickyValue) {
+                const navBarWrap = document.querySelector('.scroll-nav .nav-bar-wrap');
+                navBarWrap.style.position = supportStickyValue;
+                navBarWrap.style.top = this.navStickyTop;
+                navBarWrap.style.left = this.navStickyLeft;
+                navBarWrap.style.right = this.navStickyRight;
+                navBarWrap.style.bottom = this.navStickyBottom;
+                return true;
+            }
+            return false;
         }
     },
     mounted () {
         this.calcFixedHeightPx();
+        this.canUseSticky = this.useSticky && this.validateSticky();
         this.hanldeResize();
         this.scrollContainer = document.querySelector(this.relativeName);
         this.scrollTarget.addEventListener('scroll', this.handleScroll);

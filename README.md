@@ -6,11 +6,12 @@
 - 点击导航，页面滚动到内容对应位置
 - 可控制导航栏是否吸附固定，如吸顶效果，即滚动一定距离后，导航栏固定起来，不会被滚动出可视区域
 - 可用在页面任何位置上，不一定是顶部导航这种简单应用哦，可以复杂型应用
+- 在浏览器支持下，可以采用`position: sticky`方式实现固定
 
 此处举一个稍微复杂点的情况：
-![image](https://note.youdao.com/yws/public/resource/0360b2ee451da7a13dab208e3fe21df1/xmlnote/7A5F1D25179C427D939D22E89A9AE8E3/14459)
+![image](https://user-gold-cdn.xitu.io/2020/3/9/170bec2989d85e98?w=1180&h=847&f=gif&s=751545)
 
-具体深度解释该组件的一个开发思路，可看此文章[滚动导航+吸顶合并方案（含stikcy详解）]()
+具体深度解释该组件的一个开发思路，可看此文章[滚动导航+吸顶合并方案（含stikcy详解）](https://juejin.im/post/5e66152be51d4527235b7067)
 
 ## 安装
 npm方式：
@@ -65,8 +66,15 @@ Vue.use(scrollNav);
 - `left`：导航栏固定之后的top值，值为`Number`,`String`类型，默认是`auto`。
 - `bottom`：导航栏固定之后的top值，值为`Number`,`String`类型，默认是`auto`。
 - `color`：导航栏被选中的颜色，包括文字颜色和`border-bottom`颜色。值为`String`类型，默认是`#387af6`。
+- `useSticky`：在浏览器支持的情况下，是否采用`position:sticky`的方式实现导航栏固定。值为`Boolean`类型，默认是`true`。提供该值，主要是考虑到，如果页面的结构十分复杂，层级很多，有些情况下是无法使用`sticky`或者说不方便计算实现`sticky`的阈值时，就关闭该实现方式吧。
+- `stickyTop`：在实现`sticky`方式下，导航栏固定之后的top值，值为`Number`,`String`类型，如果不设置该值，默认跟随`top`值。
+- `stickyLeft`：在实现`sticky`方式下，导航栏固定之后的left值，值为`Number`,`String`类型，如果不设置该值，默认跟随`left`值。
+- `stickyRight`：在实现`sticky`方式下，导航栏固定之后的right值，值为`Number`,`String`类型，如果不设置该值，默认跟随`right`值。
+- `stickyBottom`：在实现`sticky`方式下，导航栏固定之后的bottom值，值为`Number`,`String`类型，如果不设置该值，默认跟随`bottom`值。
 
 ## Method
+
+### calcTop
 该组件暴露出一个名为`calcTop`的方法。主要是用来当页面内容发生变化，可能会引起各项内容的宽高发生变化，导致实际获取的导航栏和导航内容宽高发生变化，进而引起`offsetTop`的变化。
 
 该组件在不支持`sticky`的浏览器里，会采用传统的监听`scroll`事件，利用滚动距离和各项内容的`offsetTop`进行比较判断。
@@ -79,6 +87,9 @@ this.$refs.scrollNav.calcTop();
 ```
 this.$refs.scrollNav.calcTop(true);
 ```
+
+### isSupportSticky
+该方法可以告诉你，浏览器支持`position: sticky`的情况，返回值为浏览器支持的`sticky`值，即有前缀还是没前缀，抑或返回`''`，如果返回空字符串，那么就是代表浏览器不支持`sticky`
 
 ## Support us
 该组件或许还存在不足之处，或者你的使用场景更广阔，如果你有兴趣的话，可以一起努力完善这个组件。期待你的加入
