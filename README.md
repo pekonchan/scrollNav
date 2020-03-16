@@ -14,14 +14,19 @@
 具体深度解释该组件的一个开发思路，可看此文章[滚动导航+吸顶合并方案（含stikcy详解）](https://juejin.im/post/5e66152be51d4527235b7067)
 
 ## 安装
+** 该插件不包含`vue.js`的引入，请你自行引入`vue.js` **
+
+`<script>`方式直接引入`lib/vue-scroll-nav.umd.min.js`，如：
+```
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="node_modules/vue-scroll-nav/lib/vue-scroll-nav.umd.min.js"></script>
+```
+这样就可以在`Vue`应用里直接使用`<Scroll-Nav>`标签了。
+
 npm方式：
 ```
 npm i vue-scroll-nav
 ```
-你也可以直接下载打包好的js文件，通过`script`标签的方式引入。
-
-该插件不包含`vue.js`的引入，请你自行引入`vue.js`
-
 引入该插件之后，得注册组件
 ```js
 import Vue from 'vue';
@@ -52,7 +57,7 @@ Vue.use(scrollNav);
 
 ## Props
 插件提供了足够的属性，让你针对不同的复杂情况来自定义它的行为。
-- `menu`：导航栏选项，值为数组，元素固定格式为`{label: 'xxx', checked: false}`，`label`为导航的名字，`checked`是来控制导航被选中样式的
+- `menu`：必填。导航栏选项，值为数组，元素固定格式为`{label: 'xxx', checked: false}`，`label`为导航的名字，`checked`是来控制导航被选中样式的
 - `height`：导航栏的高度，一般是指未固定前的高度，值为`Number` or `String`类型，传入数字类型时，默认为`px`默认值为`52px`。
 - `width`：导航栏的宽度，一般是指未固定前的宽度，值为`Number` or `String`类型，传入数字类型时，默认为`px`；默认值为`100%`。
 - `fixedHeight`：导航栏的高度，指固定之后的高度，值为`Number` or `String`类型，传入数字类型时，默认为`px`。导航栏固定后的高度默认按照设置了的`height`属性
