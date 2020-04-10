@@ -10,6 +10,7 @@
       <div class="content">导航1内容</div>
       <div class="content">导航2内容</div>
       <div class="content">导航3内容</div>
+      <div class="content">导航4内容</div>
     </Scroll-Nav>
   </div>
 </template>
@@ -34,6 +35,9 @@ export default {
         },
         {
           label: '导航3'
+        },
+        {
+          label: '导航4'
         }
       ]
     };

@@ -211,10 +211,11 @@ export default {
         /**
          * 选择标题跳到对应内容
          */
-        selectNav (nav, index) {
+        async selectNav (nav, index) {
+            this.scrollContainer.scrollTop = this.offsetTops[`content${index}`] - this.scrollDeviation;
+            await this.$nextTick();
             this.resetNavSelect();
             nav.checked = true;
-            this.scrollContainer.scrollTop = this.offsetTops[`content${index}`] - this.scrollDeviation;
         },
         resetNavSelect () {
             this.navMenu.forEach(item => {
