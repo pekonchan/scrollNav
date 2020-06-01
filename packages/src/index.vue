@@ -15,7 +15,7 @@
                 <li
                     v-for="(item, index) in navMenu"
                     :key="item.value"
-                    :style="{color: getNavColor(item), borderBottomColor: getNavColor(item, 'border')}"
+                    :style="item.checked ? isActive : notActive"
                     @click="selectNav(item, index)">
                     {{item.label}}
                 </li>
@@ -133,17 +133,15 @@ export default {
             navBarFixed: false, // 导航栏是否被固定了
             scrollContainer: null, // 滚动条所在容器
             fixedHeightPx: 0, // 导航栏固定后的实际高度px值
-            canUseSticky: false
+            canUseSticky: false,
+            notActive: {
+                color: 'inherit',
+                borderBottomColor: 'transparent'
+            },
+            navMenu: []
         };
     },
     computed: {
-        // 如果用户导航栏选项未传checked，那么默认把checked置为false
-        navMenu () {
-            return this.menu.map(item => {
-                this.$set(item, 'checked', item.checked || false);
-                return item;
-            });
-        },
         // 主要是未固定前的导航栏的高度
         navHeight () {
             return this.createValue(this.height);
@@ -199,14 +197,31 @@ export default {
         // 绑定滚动事件的元素对象
         scrollTarget () {
             return this.relativeName.toLowerCase() === 'html' ? window : this.scrollContainer;
+        },
+        isActive () {
+            return {
+                color: this.color,
+                borderBottomColor: this.color
+            };
+        }
+    },
+    watch: {
+        menu: {
+            handler (newValue) {
+                this.navMenu = newValue.map(item => {
+                    return {
+                        label: item.label,
+                        checked: item.checked || false
+                    }
+                })
+            },
+            immediate: true,
+            deep: true
         }
     },
     methods: {
         createValue (value) {
             return typeof value === 'number' ? `${value}px` : value;
-        },
-        getNavColor (nav, type) {
-            return nav.checked ? this.color : type === 'border' ? 'transparent' : 'inherit';
         },
         /**
          * 选择标题跳到对应内容
