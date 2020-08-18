@@ -76,6 +76,7 @@ Vue.use(scrollNav);
 - `stickyLeft`：在实现`sticky`方式下，导航栏固定之后的left值，值为`Number`,`String`类型，如果不设置该值，默认跟随`left`值。
 - `stickyRight`：在实现`sticky`方式下，导航栏固定之后的right值，值为`Number`,`String`类型，如果不设置该值，默认跟随`right`值。
 - `stickyBottom`：在实现`sticky`方式下，导航栏固定之后的bottom值，值为`Number`,`String`类型，如果不设置该值，默认跟随`bottom`值。
+- `useAnimation`：当点击菜单，切换到不同的内容，是否启用过渡动画效果（浏览器支持的情况下）。值为`Boolean`类型，默认是`true`。
 
 ## Method
 

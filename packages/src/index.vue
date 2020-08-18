@@ -123,6 +123,10 @@ export default {
         useSticky: { // 在浏览器支持的情况下，是否采用sticky形式
             type: Boolean,
             default: true
+        },
+        useAnimation: { // 是否启用滚动过渡动画
+            type: Boolean,
+            default: true
         }
     },
     data () {
@@ -227,10 +231,26 @@ export default {
          * 选择标题跳到对应内容
          */
         async selectNav (nav, index) {
-            this.scrollContainer.scrollTop = this.offsetTops[`content${index}`] - this.scrollDeviation;
+            const scrollDistance = this.offsetTops[`content${index}`] - this.scrollDeviation;
+            if (this.useAnimation && this.scrollContainer.scrollTo) { // 如果支持scrollTo，则用其做动画效果过度
+                // 由于过度切换会触发onscroll事件，如果不屏蔽之前的绑定监听，那么导航栏就会出现激活状态根据滚动过程也有一个切换动画效果，感觉不好看，所以我选择不要这个效果
+                this.scrollTarget.removeEventListener('scroll', this.handleScroll);
+                // 过渡滚动动画完成后，就要启用之前屏蔽掉的滚动监听事件
+                const scrollHandler = () => {
+                    if (this.scrollContainer.scrollTop === scrollDistance) {
+                        this.scrollTarget.addEventListener('scroll', this.handleScroll);
+                        this.scrollTarget.removeEventListener('scroll', scrollHandler);
+                    }
+                };
+                this.scrollTarget.addEventListener('scroll', scrollHandler);
+                this.scrollContainer.scrollTo({ top: scrollDistance, behavior: 'smooth' });
+            } else { // 不支持，只能直接切换了
+                this.scrollContainer.scrollTop = scrollDistance;
+            }
             await this.$nextTick();
             this.resetNavSelect();
             nav.checked = true;
+            
         },
         resetNavSelect () {
             this.navMenu.forEach(item => {
