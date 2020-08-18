@@ -15,7 +15,7 @@
                 <li
                     v-for="(item, index) in navMenu"
                     :key="item.value"
-                    :style="{color: getNavColor(item), borderBottomColor: getNavColor(item, 'border')}"
+                    :style="item.checked ? isActive : notActive"
                     @click="selectNav(item, index)">
                     {{item.label}}
                 </li>
@@ -123,6 +123,10 @@ export default {
         useSticky: { // 在浏览器支持的情况下，是否采用sticky形式
             type: Boolean,
             default: true
+        },
+        useAnimation: { // 是否启用滚动过渡动画
+            type: Boolean,
+            default: true
         }
     },
     data () {
@@ -133,17 +137,15 @@ export default {
             navBarFixed: false, // 导航栏是否被固定了
             scrollContainer: null, // 滚动条所在容器
             fixedHeightPx: 0, // 导航栏固定后的实际高度px值
-            canUseSticky: false
+            canUseSticky: false,
+            notActive: {
+                color: 'inherit',
+                borderBottomColor: 'transparent'
+            },
+            navMenu: []
         };
     },
     computed: {
-        // 如果用户导航栏选项未传checked，那么默认把checked置为false
-        navMenu () {
-            return this.menu.map(item => {
-                this.$set(item, 'checked', item.checked || false);
-                return item;
-            });
-        },
         // 主要是未固定前的导航栏的高度
         navHeight () {
             return this.createValue(this.height);
@@ -199,23 +201,56 @@ export default {
         // 绑定滚动事件的元素对象
         scrollTarget () {
             return this.relativeName.toLowerCase() === 'html' ? window : this.scrollContainer;
+        },
+        isActive () {
+            return {
+                color: this.color,
+                borderBottomColor: this.color
+            };
+        }
+    },
+    watch: {
+        menu: {
+            handler (newValue) {
+                this.navMenu = newValue.map(item => {
+                    return {
+                        label: item.label,
+                        checked: item.checked || false
+                    }
+                })
+            },
+            immediate: true,
+            deep: true
         }
     },
     methods: {
         createValue (value) {
             return typeof value === 'number' ? `${value}px` : value;
         },
-        getNavColor (nav, type) {
-            return nav.checked ? this.color : type === 'border' ? 'transparent' : 'inherit';
-        },
         /**
          * 选择标题跳到对应内容
          */
         async selectNav (nav, index) {
-            this.scrollContainer.scrollTop = this.offsetTops[`content${index}`] - this.scrollDeviation;
+            const scrollDistance = this.offsetTops[`content${index}`] - this.scrollDeviation;
+            if (this.useAnimation && this.scrollContainer.scrollTo) { // 如果支持scrollTo，则用其做动画效果过度
+                // 由于过度切换会触发onscroll事件，如果不屏蔽之前的绑定监听，那么导航栏就会出现激活状态根据滚动过程也有一个切换动画效果，感觉不好看，所以我选择不要这个效果
+                this.scrollTarget.removeEventListener('scroll', this.handleScroll);
+                // 过渡滚动动画完成后，就要启用之前屏蔽掉的滚动监听事件
+                const scrollHandler = () => {
+                    if (this.scrollContainer.scrollTop === scrollDistance) {
+                        this.scrollTarget.addEventListener('scroll', this.handleScroll);
+                        this.scrollTarget.removeEventListener('scroll', scrollHandler);
+                    }
+                };
+                this.scrollTarget.addEventListener('scroll', scrollHandler);
+                this.scrollContainer.scrollTo({ top: scrollDistance, behavior: 'smooth' });
+            } else { // 不支持，只能直接切换了
+                this.scrollContainer.scrollTop = scrollDistance;
+            }
             await this.$nextTick();
             this.resetNavSelect();
             nav.checked = true;
+            
         },
         resetNavSelect () {
             this.navMenu.forEach(item => {
