@@ -11,6 +11,8 @@
 此处举一个稍微复杂点的情况：
 ![image](https://user-gold-cdn.xitu.io/2020/3/9/170bec2989d85e98?w=1180&h=847&f=gif&s=751545)
 
+[在线demo示例](https://jsbin.com/wekudat/edit?html,css,js,output)
+
 具体深度解释该组件的一个开发思路，可看此文章[滚动导航+吸顶合并方案（含stikcy详解）](https://juejin.im/post/5e66152be51d4527235b7067)
 
 ## 安装
